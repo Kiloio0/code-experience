@@ -1,0 +1,49 @@
+#include <bits/stdc++.h>
+#define ll long long 
+using namespace std;
+ll n,m,s,head[100009],to[200009],nex[200009],tot,d[200009],dis[100009];
+bool vis[100009];
+struct node{
+	ll x,dis;
+	bool operator <(const node &x)const{
+		return x.dis<dis;
+	}
+};
+priority_queue <node> q;
+void add(ll u,ll v,ll w){
+	to[++tot]=v,nex[tot]=head[u],head[u]=tot,d[tot]=w;
+}
+void dj(){
+	dis[s]=0;
+	q.push((node){s,0});
+	while(!q.empty()){
+		node tmp=q.top();
+		q.pop();
+		ll x=tmp.x,dd=tmp.dis;
+		if(vis[x]) continue;
+		vis[x]=1;
+		for(int i=head[x]; i; i=nex[i]){
+			int v=to[i];
+			if(dis[v]>dis[x]+d[i]){
+				dis[v]=dis[x]+d[i];
+				if(!vis[v]){
+					q.push((node){v,dis[v]});
+				}
+			}
+		}
+	}
+}
+int main(){
+	cin>>n>>m>>s;
+	memset(dis,0x3f,sizeof(dis));
+	for(int i=1; i<=m; i++){
+		int u,v,w;
+		scanf("%d%d%d",&u,&v,&w);
+		add(u,v,w);
+	}
+	dj();
+	for(int i=1; i<=n; i++){
+		cout<<dis[i]<<" ";
+	}
+	return 0;
+}
