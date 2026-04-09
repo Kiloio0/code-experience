@@ -1,0 +1,27 @@
+#include <bits/stdc++.h>
+using namespace std;
+int n,head[100009],nex[200009],to[200009],tot,dis[100009],ans;
+void add(int u,int v){
+	to[++tot]=v,nex[tot]=head[u],head[u]=tot;
+}
+void dp(int u,int fa){
+	for(int i=head[u]; i; i=nex[i]){
+		int v=to[i];
+		if(fa!=v){
+			dp(v,u);
+			ans=max(ans,dis[u]+dis[v]+1);
+			dis[u]=max(dis[u],dis[v]+1);
+		}
+	}
+}
+int main(){
+	cin>>n;
+	for(int i=1; i<n; i++){
+		int u,v;
+		cin>>u>>v;
+		add(u,v),add(v,u);
+	}
+	dp(1,0);
+	cout<<ans;
+	return 0;
+}
