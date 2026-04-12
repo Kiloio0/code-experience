@@ -1,0 +1,55 @@
+#include <bits/stdc++.h>
+using namespace std;
+long long t,n,m,head[3003],to[6003],nex[6003],w[6003],tot,vis[3003],dis[3003],cnt[3003];
+queue <int> q;
+void add(int x,int y,int z){
+	to[++tot]=y,nex[tot]=head[x],head[x]=tot,w[tot]=z;
+}
+void spfa(){
+	long long op=pow(2,31)-1;
+	for(int i=1; i<=n; i++){
+		dis[i]=op;
+	}
+	memset(vis,0,sizeof(vis));
+	memset(cnt,0,sizeof(cnt));
+	while(!q.empty()) q.pop();
+	q.push(1);
+	vis[1]=1,dis[1]=0;
+	while(!q.empty()){
+		int u=q.front();
+		q.pop();
+		vis[u]=0;
+		for(int i=head[u]; i; i=nex[i]){
+			int v=to[i];
+			if(dis[v]>dis[u]+w[i]){
+				dis[v]=dis[u]+w[i];
+				if(!vis[v]){
+					if(++cnt[v]>=n){
+						cout<<"YES"<<'\n';
+						return ;
+					}
+					vis[v]=1;
+					q.push(v);
+				}
+			}
+		}
+	}
+	cout<<"NO"<<'\n';
+}
+int main(){
+	cin>>t;
+	while(t--){
+		cin>>n>>m;
+		tot=0;
+		memset(head,0,sizeof(head));
+		for(int i=1; i<=m; i++){
+			int a,b,c;
+			cin>>a>>b>>c;
+			add(a,b,c);
+			if(c>=0) add(b,a,c);
+		}
+		spfa();
+	}
+	
+	return 0;
+}
