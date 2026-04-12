@@ -1,0 +1,40 @@
+#include <bits/stdc++.h>
+using namespace std;
+long long n,m,s,head[10009],to[1000009],nex[1000009],w[1000009],tot,vis[10009],dis[10009];
+void add(int x,int y,int z){
+	to[++tot]=y,nex[tot]=head[x],head[x]=tot,w[tot]=z;
+}
+queue <int> q;
+int main(){
+	cin>>n>>m>>s;
+	for(int i=1; i<=m; i++){
+		int a,b,c;
+		cin>>a>>b>>c;
+		add(a,b,c);
+	}
+	long long op=pow(2,31)-1;
+	for(int i=1; i<=n; i++){
+		dis[i]=op;
+	}
+	q.push(s);
+	vis[s]=1,dis[s]=0;
+	while(!q.empty()){
+		int u=q.front();
+		q.pop();
+		vis[u]=0;
+		for(int i=head[u]; i; i=nex[i]){
+			int v=to[i];
+			if(dis[v]>dis[u]+w[i]){
+				dis[v]=dis[u]+w[i];
+				if(!vis[v]){
+					vis[v]=1;
+					q.push(v);
+				}
+			}
+		}
+	}
+	for(int i=1; i<=n; i++){
+		cout<< ((i==s)?0:dis[i]) <<" ";
+	}
+	return 0;
+}
