@@ -1,0 +1,51 @@
+#include <bits/stdc++.h>
+using namespace std;
+int n,m,k,s,t,head[110009],to[2500009],nex[2500009],w[2500009],tot,dis[110009],vis[110009];
+void add(int u,int v,int c){
+	to[++tot]=v,nex[tot]=head[u],head[u]=tot,w[tot]=c;
+}
+struct node{
+	int x,dis;
+	bool operator <(const node &x)const{
+		return x.dis<dis;
+	}
+};
+priority_queue <node> q;
+void dj(){
+	memset(dis,0x3f,sizeof(dis));
+	q.push((node){s,0});
+	dis[s]=0;
+	while(!q.empty()){
+		node tmp=q.top();q.pop();
+		int u=tmp.x,d=tmp.dis;
+		if(vis[u]) continue;
+		vis[u]=1;
+		for(int i=head[u]; i; i=nex[i]){
+			int v=to[i];
+			if(dis[v]>dis[u]+w[i]){
+				dis[v]=dis[u]+w[i];
+				if(vis[v]) continue;
+				q.push((node){v,dis[v]});
+			}
+		}
+	}
+}
+int main(){
+	cin>>n>>m>>k>>s>>t;
+	for(int i=1; i<=m; i++){
+		int a,b,c;
+		cin>>a>>b>>c;
+		add(a,b,c);
+		add(b,a,c);
+		for(int j=1; j<=k; j++) {
+			add(a+(j-1)*n,b+j*n,0),add(b+(j-1)*n,a+j*n,0);
+			add(a+j*n,b+j*n,c),add(b+j*n,a+j*n,c);
+		}
+	}
+	for(int i=1; i<=k; i++){
+		add(t+(i-1)*n,t+i*n,0);
+	}
+	dj();
+	cout<<dis[t+n*k];
+	return 0;
+}
