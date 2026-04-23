@@ -1,0 +1,53 @@
+#include <bits/stdc++.h>
+using namespace std;
+int n,m,tot,nex[10009],to[10009],head[5009],w[10009],cnt[5009],dis[5009],vis[5009];
+bool op=1;
+queue <int> q; 
+void add(int u,int v,int c){
+	to[++tot]=v,nex[tot]=head[u],head[u]=tot,w[tot]=c;
+}
+void spfa(int x){
+	dis[x]=0,vis[x]=1;
+	q.push(x);
+	while(!q.empty()){
+		int u=q.front();
+		q.pop();
+		vis[u]=0;
+		for(int i=head[u]; i; i=nex[i]){
+			int v=to[i];
+			if(dis[v]>dis[u]+w[i]){
+				dis[v]=dis[u]+w[i];
+				if(!vis[v]){
+					vis[v]=1,cnt[v]++;
+					q.push(v);
+					if(cnt[v]==n+1){
+						op=0;
+						return ;
+					}
+				}
+			}
+		}
+	}
+}
+int main(){
+	cin>>n>>m;
+	int a,b,c;
+	memset(dis,0x3f,sizeof(dis));
+	for(int i=1; i<=m; i++){
+		cin>>a>>b>>c;
+		add(b,a,c);
+	}
+	for(int i=1; i<=n; i++){
+		add(0,i,0);
+	}
+	spfa(0);
+	if(op==0){
+		cout<<"NO";
+	}
+	else{
+		for(int i=1; i<=n; i++)	{
+			cout<<dis[i]<<" ";
+		}
+	}
+	return 0;
+}
