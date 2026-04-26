@@ -1,0 +1,38 @@
+#include <bits/stdc++.h>
+using namespace std;
+long long n,k,sum,fa[100009],mark[100009];
+struct node{
+	int u,v,w;
+}e[100009];
+bool cmd(node x,node y){
+	return x.w>y.w; 
+}
+int find(int x){
+	return x==fa[x]?x:fa[x]=find(fa[x]);
+}
+int main(){
+	cin>>n>>k;
+	int x;
+	for(int i=1; i<=k; i++){
+		cin>>x;
+		mark[x]=1;
+	}
+	for(int i=1; i<n; i++){
+		cin>>e[i].u>>e[i].v>>e[i].w;
+		sum+=e[i].w;
+	}
+	sort(e+1,e+n,cmd);
+	for(int i=1; i<=n; i++){
+		fa[i]=i;
+	}
+	for(int i=1; i<n; i++){
+		int u=e[i].u,v=e[i].v,w=e[i].w;
+		int fu=find(u),fv=find(v);
+		if(mark[fu] && mark[fv]) continue;
+		fa[fu]=fv,sum-=w;
+		if(mark[fu]) mark[fv]=1;
+		if(mark[fv]) mark[fu]=1;
+	}
+	cout<<sum;
+	return 0;
+}
