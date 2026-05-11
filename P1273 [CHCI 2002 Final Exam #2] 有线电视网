@@ -1,0 +1,109 @@
+#include <bits/stdc++.h>
+using namespace std;
+int n,m,tot,head[3003],to[30009],nex[30009],w[30009],f[3003][3003],siz[3003];
+void add(int u,int v,int c){
+	to[++tot]=v,nex[tot]=head[u],head[u]=tot,w[tot]=c;
+}
+void dfs(int u){
+	if(u>=n-m+1){
+		siz[u]=1;
+		return ;
+	}
+	for(int i=head[u]; i; i=nex[i]){
+		int v=to[i];
+		dfs(v);
+		siz[u]+=siz[v];
+		for(int j=min(m,siz[u]); j>0; j--){
+			for(int k=1; k<=siz[v]; k++){
+				f[u][j]=max(f[u][j],f[u][j-k]+f[v][k]+w[i]);
+			}
+		}
+	}
+}
+int main(){
+	cin>>n>>m;
+	memset(f,-0x3f,sizeof(f));
+	for(int i=1; i<=n-m; i++){
+		int k,a,c;
+		cin>>k;
+		for(int j=1; j<=k; j++){
+			cin>>a>>c;
+			add(i,a,-c);
+		}
+		f[i][0]=0;
+	}
+	for(int i=n-m+1; i<=n; i++){
+		cin>>f[i][1];
+		f[i][0]=0;
+	}
+	dfs(1);
+	for(int i=n; i>=1; i--){
+		if(f[1][i]>=0){
+			cout<<i;
+			return 0;
+		}
+	}
+	return 0;
+}
+/*
+#include<cmath>
+#include<vector>
+#include<cstdio>
+#include<cstring>
+#include<iostream>
+#include<algorithm>
+using namespace std;
+const int N=3010; 
+const int INF=1e9;
+inline int read(){
+	int X=0,w=0;char ch=0;
+	while(!isdigit(ch)){w|=ch=='-';ch=getchar();}
+	while(isdigit(ch))X=(X<<3)+(X<<1)+(ch^48),ch=getchar();
+	return w?-X:X;
+}
+struct node{
+	int to,nxt;
+}e[N];
+int n,m,cnt,head[N],c[N];
+inline void add(int u,int v){
+	e[++cnt].to=v;e[cnt].nxt=head[u];head[u]=cnt;
+}
+int f[N][N],idx[N],sz[N],tot;
+void dfs(int u){
+	sz[u]=1;
+	for(int i=head[u];i;i=e[i].nxt){
+		int v=e[i].to;
+		dfs(v);sz[u]+=sz[v];
+	}
+	idx[++tot]=u;
+}
+int main(){
+	n=read(),m=read();
+	for(int u=1;u<=n-m;u++){
+		int k=read();
+		for(int j=1;j<=k;j++){
+			int v=read();c[v]=-read();
+			add(u,v);
+		}
+	}
+	for(int u=n-m+1;u<=n;u++)c[u]+=read();
+	dfs(1);
+	for(int i=0;i<=tot;i++)
+		for(int j=1;j<=m;j++)
+			f[i][j]=-INF;
+	for(int i=1;i<=tot;i++){
+		int u=idx[i];
+		for(int j=1;j<=m;j++){
+			if(n-m+1<=u)f[i][j]=max(f[i-1][j-1]+c[u],f[i-1][j]);
+			else f[i][j]=max(f[i-1][j]+c[u],f[i-sz[u]][j]);
+		}
+	}
+	for(int i=m;i>=0;i--){
+		if(f[tot][i]>=0){
+			printf("%d\n",i);return 0;
+		}
+	}
+	return 0;
+}
+
+*/
