@@ -1,0 +1,37 @@
+#include <bits/stdc++.h>
+using namespace std;
+int n,p,f[155][155],head[155],nex[155],to[155],tot,siz[155],ans;
+void add(int u,int v){
+	to[++tot]=v,nex[tot]=head[u],head[u]=tot;
+}
+void dfs(int u,int fa){
+	siz[u]=1,f[u][1]=0;
+	for(int i=head[u]; i; i=nex[i]){
+		int v=to[i];
+		if(v==fa) continue;
+		dfs(v,u);
+		siz[u]+=siz[v];
+		for(int k=siz[u]; k>=1; k--){
+			f[u][k]+=1;
+			for(int l=1; l<k; l++){
+				f[u][k]=min(f[u][k],f[u][k-l]+f[v][l]);
+			}
+		}
+	}
+}
+int main(){
+	cin>>n>>p;
+	for(int i=1; i<n; i++){
+		int u,v;
+		cin>>u>>v;
+		add(u,v);
+	}
+	memset(f,0x3f,sizeof(f));
+	dfs(1,0);
+	ans=f[1][p];
+	for(int i=2; i<=n; i++){
+		ans=min(ans,f[i][p]+1);
+	}
+	cout<<ans;
+	return 0;
+}
