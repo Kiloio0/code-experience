@@ -1,0 +1,30 @@
+#include <bits/stdc++.h>
+using namespace std;
+long long t,n,m,p,jie[100010];
+long long qsm(long long a,long long b,long long c){
+	long long num=1;
+	a%=c;
+	while(b){
+		if(b&1) num=(num*a)%c;
+		b>>=1,a=(a*a)%c;
+	}
+	return num;
+}
+long long c(long long n,long long m,long long p){
+	return (m>n)?0:((jie[n]*qsm(jie[m],p-2,p))%p*qsm(jie[n-m],p-2,p)%p);
+}
+long long lucas(long long n,long long m,long long p){
+	return (m==0)?1:c(n%p,m%p,p)*lucas(n/p,m/p,p)%p;
+}
+int main(){
+	cin>>t;
+	while(t--){
+		cin>>n>>m>>p;
+		jie[0]=1;
+		for(int i=1; i<=p; i++){
+			jie[i]=(jie[i-1]*i)%p;
+		}
+		cout<<lucas(n+m,n,p)<<endl;
+	}
+	return 0;
+}
