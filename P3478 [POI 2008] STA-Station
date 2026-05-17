@@ -1,0 +1,45 @@
+#include <bits/stdc++.h>
+using namespace std;
+int n,head[1000009],to[2000009],nex[2000009],tot;
+long long dep[1000009],sum,siz[1000009],f[1000009];
+inline void add(int u,int v){
+	to[++tot]=v,nex[tot]=head[u],head[u]=tot;
+}
+inline void dfs(int u,int fa){
+	siz[u]=1;
+	for(int i=head[u]; i; i=nex[i]){
+		int v=to[i];
+		if(v==fa) continue;
+		dep[v]=dep[u]+1;
+		dfs(v,u);
+		siz[u]+=siz[v];
+	}
+}
+inline void dp(int u,int fa){
+	for(int i=head[u]; i; i=nex[i]){
+		int v=to[i];
+		if(v==fa) continue;
+		f[v]=f[u]+n-2*siz[v];
+		dp(v,u);
+	}
+}
+int main(){
+	cin>>n;
+	for(int i=1; i<n; i++){
+		int u,v;
+		cin>>u>>v;
+		add(u,v),add(v,u);
+	}
+	dfs(1,0);
+	for(int i=1; i<=n; i++){
+		sum+=dep[i];
+	}
+	f[1]=sum;
+	dp(1,0);
+	long long maxn=0,ans=1;
+	for(int i=1; i<=n; i++){
+		if(maxn<f[i]) maxn=f[i],ans=i;
+	}
+	cout<<ans;
+	return 0;
+}
