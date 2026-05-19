@@ -1,0 +1,51 @@
+#include <bits/stdc++.h>
+using namespace std;
+long long n,c[100009],tot,head[100009],nex[200009],to[200009],dis[100009],fa[100009],siz[100009];
+long long w[200009],sum,f[100009],minn=0x3f3f3f3f3f3f3f3f;
+void add(int u,int v,int s){
+	to[++tot]=v,nex[tot]=head[u],head[u]=tot,w[tot]=s;
+}
+void dfs(int u,int x){
+	long long cnt=0;
+	for(int i=head[u]; i; i=nex[i]){
+		int v=to[i];
+		if(v==x) continue;
+		dfs(v,u);
+		dis[u]+=dis[v]+w[i]*siz[v];
+		cnt+=siz[v];
+		//cout<<u<<" "<<v<<" "<<cnt<<" "<<siz[v]<<" "<<dis[u]<<'\n';
+	}
+	siz[u]=cnt+c[u];
+}
+void dp(int u,int x){
+	//cout<<u<<" "<<x<<" "<<f[u]<<endl;
+	for(int i=head[u]; i; i=nex[i]){
+		int v=to[i];
+		if(v==x) continue;
+		f[v]=f[u]+w[i]*(sum-2*siz[v]);
+		dp(v,u);
+	}
+}
+int main(){
+	cin>>n;
+	for(int i=1; i<=n; i++){
+		cin>>c[i];
+		sum+=c[i];
+	}
+	for(int i=1; i<n; i++){
+		int u,v,s;
+		cin>>u>>v>>s;
+		add(u,v,s),add(v,u,s);
+	}
+	for(int i=1; i<=n; i++){
+		fa[i]=i;
+	}
+	dfs(1,0);
+	f[1]=dis[1];
+	dp(1,0);
+	for(int i=1; i<=n; i++){
+		minn=min(minn,f[i]);
+	}
+	cout<<minn;
+	return 0;
+}	
