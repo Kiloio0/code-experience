@@ -1,0 +1,97 @@
+#include <bits/stdc++.h>
+using namespace std;
+int n,m,tot,vis[200009],fa[100009],dep[100009],id[100009],nex[100009],f[100009][22];
+long long ans[200009];
+struct node{
+	int u,v,w,id;
+}e[200009];
+vector <node> g[100009];
+void add(int u,int v,int c,int i){
+	e[++tot].u=u,e[tot].v=v,e[tot].w=c,e[tot].id=i;
+}
+bool cmd(node x,node y){
+	return x.w<y.w;
+}
+int find(int x){
+	return x==fa[x]?x:fa[x]=find(fa[x]);
+}
+void dfs(int u,int fat){
+	dep[u]=dep[fat]+1;
+	nex[u]=f[u][0]=fat;
+	for(int i=1; i<20; i++)
+		f[u][i]=f[f[u][i-1]][i-1];
+	for(node i : g[u]){
+		if(i.v==fat) continue;
+		id[i.v]=i.id;
+		dfs(i.v,u);
+	}
+}
+int lca(int u,int v){
+	if(dep[u]<dep[v]) swap(u,v);
+	for(int i=19; i>=0; i--){
+		if(f[u][i] && dep[f[u][i]]>=dep[v]) u=f[u][i];
+	}
+	if(u==v) return u;
+	for(int i=19; i>=0; i--) {
+		if(f[u][i] && f[v][i] && f[u][i]!=f[v][i]) {
+			u=f[u][i];
+			v=f[v][i];
+		}
+	}
+	return f[u][0];
+}
+void line(int u,int fat,int w){
+	while(dep[u]>dep[fat]){
+		if(!ans[id[u]]) ans[id[u]]=w;
+		int next_pos=nex[u];
+		nex[u]=fat;
+		u=next_pos;
+	}
+}
+void merge(int u,int v,int w){
+	int l=lca(u,v);
+	line(u,l,w),line(v,l,w);
+}
+int main(){	
+	cin>>n>>m;
+	for(int i=1; i<=m; i++){
+		int u,v,c;
+		cin>>u>>v>>c;
+		add(u,v,c,i);
+	}
+	sort(e+1,e+1+m,cmd);
+	for(int i=1; i<=n; i++){
+		fa[i]=i;
+	}
+	int cnt=0;
+	for(int i=1; i<=m; i++){
+		int u=find(e[i].u),v=find(e[i].v);
+		if(u==v) continue;
+		vis[e[i].id]=1;
+		ans[0]+=e[i].w;
+		fa[u]=v;
+		cnt++;
+		g[e[i].u].push_back({e[i].u,e[i].v,e[i].w,e[i].id});
+		g[e[i].v].push_back({e[i].v,e[i].u,e[i].w,e[i].id});
+	}
+	if(cnt<n-1){
+		for(int i=1; i<=m; i++) cout<<-1<<"\n";
+		return 0;
+	}
+	dep[0]=0; 
+	dfs(1, 0);
+	for(int i=1; i<=m; i++){
+		if(!vis[e[i].id]) merge(e[i].u,e[i].v,e[i].w);
+	}
+	for(int i=1; i<=m; i++){
+		if(vis[e[i].id]){
+			if(ans[e[i].id]) ans[e[i].id]+=ans[0]-e[i].w;
+			else ans[e[i].id]=-1;
+		}
+		else ans[e[i].id]=ans[0];
+	}	
+	for(int i=1; i<=m; i++){
+		cout<<ans[i]<<"\n";
+	}
+	return 0;
+}
