@@ -1,0 +1,36 @@
+#include <bits/stdc++.h>
+using namespace std;
+int n,m,a[1003][1003],l[1003][1003],r[1003][1003],R[1003][1003],L[1003][1003],ans,h[1003][1003];
+int main(){
+	cin>>n>>m;
+	char c;
+	for(int i=1; i<=n; i++){
+		for(int j=1; j<=m; j++){
+			cin>>c;
+			if(c=='F') a[i][j]=1;
+		}
+	}
+	for(int i=1; i<=n; i++){
+		int op=0;
+		for(int j=1; j<=m; j++) {
+			if(a[i][j]) l[i][j]=op;
+			else L[i][j]=1,op=j;
+		}
+		op=m+1;
+		for(int j=m; j>=1; j--){
+			if(a[i][j]) r[i][j]=op;
+			else R[i][j]=m,op=j;
+		}
+		R[0][i]=m;
+	}
+	for(int i=1; i<=n; i++){
+		for(int j=1; j<=m; j++){
+			if(!a[i][j]) continue;
+			h[i][j]=h[i-1][j]+1;
+			L[i][j]=max(l[i][j]+1,L[i-1][j]),R[i][j]=min(r[i][j]-1,R[i-1][j]);
+			ans=max(ans,h[i][j]*(R[i][j]-L[i][j]+1));
+		} 
+	}
+	cout<<1ll*ans*3;
+	return 0;
+}
