@@ -1,0 +1,34 @@
+#include <bits/stdc++.h>
+using namespace std;
+long long n,m,a[1003],re[1003],dp[1003][2003],ans;
+int pro(int x){
+	int op[34],wei=0,ans=0;
+	while(x){
+		op[++wei]=x%2,x/=2;
+	}
+	reverse(op+1,op+1+wei);
+	for(int i=1; i<=wei; i++){
+		if(op[i]) ans+=1<<(i-1);
+	}
+	return ans;
+}
+int main(){
+	cin>>n>>m;
+	for(int i=1; i<=n; i++){
+		cin>>a[i];
+		re[i]=pro(a[i]);
+	}
+	for(int i=1; i<=n; i++){
+		for(int j=1; j<=2*m+1; j++){
+			if(j%2==0){
+				dp[i][j]=max(dp[i-1][j],dp[i-1][j-1])+re[i]; 
+			}
+			else dp[i][j]=max(dp[i-1][j],dp[i-1][j-1])+a[i];
+		}
+	}
+	for(int i=1; i<=2*m+1; i++){
+		ans=max(ans,dp[n][i]);
+	}
+	cout<<ans;
+	return 0;
+}
