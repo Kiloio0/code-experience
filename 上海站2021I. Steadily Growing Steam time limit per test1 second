@@ -1,0 +1,33 @@
+#include <bits/stdc++.h>
+using namespace std;
+int n,k,v[103],t[103];
+long long dp[5203][102],last[5203][102],ans;
+int main(){
+	cin>>n>>k;
+	int maxn=0;
+	for(int i=1; i<=n; i++)	{
+		cin>>v[i]>>t[i];
+		maxn+=t[i];
+	}
+	memset(dp,-0x3f,sizeof(dp));
+	ans=dp[0][0];
+	dp[2600][0]=0;
+	for(int i=1; i<=n; i++){
+		memcpy(last,dp,sizeof(dp));
+		for(int j=0; j<=k; j++){
+			for(int w=0; w<=5200; w++){
+				if(w+t[i]<=5200) dp[w][j]=max(dp[w][j],last[w+t[i]][j]+v[i]);
+				if(w-t[i]>=0) dp[w][j]=max(dp[w][j],last[w-t[i]][j]+v[i]);
+				if(j>0){
+					if(w+2*t[i]<5200) dp[w][j]=max(dp[w][j],last[w+2*t[i]][j-1]+v[i]);
+					if(w-2*t[i]>=0) dp[w][j]=max(dp[w][j],last[w-2*t[i]][j-1]+v[i]);
+				}
+			}
+		}
+	}
+	for(int i=0; i<=k; i++){
+		ans=max(ans,dp[2600][i]);
+	}
+	cout<<ans;
+	return 0;
+}
