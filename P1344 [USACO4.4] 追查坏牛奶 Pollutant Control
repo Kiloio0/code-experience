@@ -1,0 +1,95 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+const int N=100005;
+const long long inf=1e18;
+
+int n,m,s,t,tot=1;
+int head[N],dep[N],cur[N],deg[N];
+long long ans,sum;
+queue<int> q;
+
+struct Edge{
+    int to,nxt;
+    long long cap;
+}e[800005];
+
+void add(int u,int v,long long c){
+    e[++tot]={v,head[u],c};
+    head[u]=tot;
+    e[++tot]={u,head[v],0};
+    head[v]=tot;
+}
+
+bool bfs(){
+    memset(dep,-1,sizeof(dep));
+    while(!q.empty()) q.pop();
+
+    q.push(s);
+    dep[s]=0;
+
+    while(!q.empty()){
+        int u=q.front();
+        q.pop();
+        for(int i=head[u];i;i=e[i].nxt){
+            int v=e[i].to;
+            if(e[i].cap>0&&dep[v]==-1){
+                dep[v]=dep[u]+1;
+                q.push(v);
+            }
+        }
+    }
+    return dep[t]!=-1;
+}
+
+long long dfs(int u,long long flow){
+    if(u==t) return flow;
+
+    for(int &i=cur[u];i;i=e[i].nxt){
+        int v=e[i].to;
+        if(e[i].cap>0&&dep[v]==dep[u]+1){
+            long long x=dfs(v,min(flow,e[i].cap));
+            if(x){
+                e[i].cap-=x;
+                e[i^1].cap+=x;
+                return x;
+            }
+        }
+    }
+    return 0;
+}
+
+long long dinic(){
+    long long ans=0,x;
+    while(bfs()){
+        memcpy(cur,head,sizeof(head));
+        while((x=dfs(s,inf))) ans+=x;
+    }
+    return ans;
+}
+int find(int u,int fa){
+	int sum=0;
+	for(int i=head[u]; i; i=e[i].nxt){
+		int v=e[i].to;
+		if(v==fa) continue;
+		if(e[i].cap==0) return 1;
+		else sum+=find(v,u);
+	}
+	return sum;
+}
+int main(){
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    cin>>n>>m;
+    s=1,t=n;
+    for(int i=1;i<=m;i++){
+        int u,v;
+        long long c;
+        cin>>u>>v>>c;
+        add(u,v,c*1003+1);
+    }
+    ans=dinic();
+    cout<<ans/1003<<" "<<ans%1003;
+    return 0;
+}
