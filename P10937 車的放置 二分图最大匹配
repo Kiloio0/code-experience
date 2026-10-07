@@ -1,0 +1,41 @@
+#include <bits/stdc++.h>
+using namespace std;
+int n,m,e,match[505],head[505],nex[50009],to[50009],tot,vis[505],ans,mark[309][309];
+void add(int u,int v){
+	to[++tot]=v,nex[tot]=head[u],head[u]=tot;
+}
+int dfs(int u){
+	for(int i=head[u]; i; i=nex[i]){
+		int v=to[i];
+		if(vis[v]) continue;
+		vis[v]=1;
+		if(!match[v] || dfs(match[v])){
+			match[v]=u;
+			return 1;
+		}
+	}
+	return 0;
+}
+int main(){
+	ios::sync_with_stdio(false);
+	cin.tie(nullptr);
+	int t;
+	cin>>n>>m>>t;
+	for(int i=1; i<=t; i++){
+		int u,v;
+		cin>>u>>v;
+		mark[u][v]=1;
+	}
+	for(int i=1; i<=n; i++){
+		for(int j=1; j<=m; j++){
+			if(!mark[i][j]) add(i,j);
+		}
+	}
+	for(int i=1; i<=n; i++){
+		memset(vis,0,sizeof(vis));
+		ans+=dfs(i);
+	}
+	cout<<ans;
+	return 0;
+}
+
