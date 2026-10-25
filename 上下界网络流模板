@@ -1,0 +1,211 @@
+//无源汇上下界可行流
+#include <bits/stdc++.h>
+using namespace std;
+
+const int N=10005;
+const long long inf=1e18;
+
+int n,m,s,t,tot=1,id[10005],l[100005],r;
+int head[N],dep[N],cur[N],u[100005],v[100005];
+long long ans,d[10005];
+queue<int> q;
+
+struct Edge{
+    int to,nxt;
+    long long cap;
+}e[400005];
+
+void add(int u,int v,long long c){
+    e[++tot]={v,head[u],c};
+    head[u]=tot;
+    e[++tot]={u,head[v],0};
+    head[v]=tot;
+}
+
+bool bfs(){
+    memset(dep,-1,sizeof(dep));
+    while(!q.empty()) q.pop();
+
+    q.push(s);
+    dep[s]=0;
+
+    while(!q.empty()){
+        int u=q.front();
+        q.pop();
+        for(int i=head[u];i;i=e[i].nxt){
+            int v=e[i].to;
+            if(e[i].cap>0&&dep[v]==-1){
+                dep[v]=dep[u]+1;
+                q.push(v);
+            }
+        }
+    }
+    return dep[t]!=-1;
+}
+
+long long dfs(int u,long long flow){
+    if(u==t) return flow;
+
+    for(int &i=cur[u];i;i=e[i].nxt){
+        int v=e[i].to;
+        if(e[i].cap>0&&dep[v]==dep[u]+1){
+            long long x=dfs(v,min(flow,e[i].cap));
+            if(x){
+                e[i].cap-=x;
+                e[i^1].cap+=x;
+                return x;
+            }
+        }
+    }
+    return 0;
+}
+
+long long dinic(){
+    long long ans=0,x;
+    while(bfs()){
+        memcpy(cur,head,sizeof(head));
+        while((x=dfs(s,inf))) ans+=x;
+    }
+    return ans;
+}
+
+int main(){
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+	long long sum=0;
+    cin>>n>>m;
+    s=0,t=n+1;
+    for(int i=1;i<=m;i++){
+        cin>>u[i]>>v[i]>>l[i]>>r;
+        id[i]=tot+1;
+        add(u[i],v[i],r-l[i]);
+        d[u[i]]-=l[i],d[v[i]]+=l[i];
+    }
+	for(int i=1; i<=n; i++){
+		if(d[i]<0){
+			add(i,t,-d[i]);
+		}
+		else if(d[i]>0){
+			add(s,i,d[i]);
+			sum+=d[i];
+		}
+	}
+	if(dinic()<sum){
+		cout<<"No";
+	}
+	else{
+		cout<<"Yes\n";
+		for(int i=1; i<=m; i++){
+			cout<<e[id[i]^1].cap+l[i]<<'\n';
+		}
+	}
+    return 0;
+}
+//有源汇上下界最小流 最大流只要最后从S跑到T，F0加上dinic()就行
+#include <bits/stdc++.h>
+using namespace std;
+const int N=10005;
+const long long inf=1e18;
+int n,m,S,T,s,t,tot=1;
+int head[N],dep[N],cur[N];
+long long d[N];
+queue<int> q;
+struct Edge{
+    int to,nxt;
+    long long cap;
+}e[400005];
+void add(int u,int v,long long c){
+    e[++tot]={v,head[u],c};
+    head[u]=tot;
+    e[++tot]={u,head[v],0};
+    head[v]=tot;
+}
+
+bool bfs(){
+    memset(dep,-1,sizeof(dep));
+    while(!q.empty()) q.pop();
+    q.push(s);
+    dep[s]=0;
+    while(!q.empty()){
+        int u=q.front();
+        q.pop();
+        for(int i=head[u];i;i=e[i].nxt){
+            int v=e[i].to;
+            if(e[i].cap>0&&dep[v]==-1){
+                dep[v]=dep[u]+1;
+                q.push(v);
+            }
+        }
+    }
+    return dep[t]!=-1;
+}
+
+long long dfs(int u,long long flow){
+    if(u==t) return flow;
+    for(int &i=cur[u];i;i=e[i].nxt){
+        int v=e[i].to;
+        if(e[i].cap>0&&dep[v]==dep[u]+1){
+            long long x=dfs(v,min(flow,e[i].cap));
+            if(x){
+                e[i].cap-=x;
+                e[i^1].cap+=x;
+                return x;
+            }
+        }
+    }
+    return 0;
+}
+
+long long dinic(){
+    long long ans=0,x;
+    while(bfs()){
+        memcpy(cur,head,sizeof(head));
+        while((x=dfs(s,inf))) ans+=x;
+    }
+    return ans;
+}
+
+int main(){
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+    cin>>n>>m>>S>>T;
+    int SS=n+1,TT=n+2;
+    long long sum=0;
+
+    for(int i=1;i<=m;i++){
+        int u,v;
+        long long l,r;
+        cin>>u>>v>>l>>r;
+        add(u,v,r-l);
+        d[u]-=l;
+        d[v]+=l;
+    }
+
+    int baseTot=tot;
+    int idTS=tot+1;
+    add(T,S,inf);
+
+    for(int i=1;i<=n;i++){
+        if(d[i]>0){
+            add(SS,i,d[i]);
+            sum+=d[i];
+        }
+        else if(d[i]<0){
+            add(i,TT,-d[i]);
+        }
+    }
+
+    s=SS,t=TT;
+
+    if(dinic()!=sum){
+        cout<<"N\n";
+        return 0;
+    }
+
+    long long F0=e[idTS^1].cap;
+
+    for(int i=baseTot+1;i<=tot;i++) e[i].cap=0;
+    s=T,t=S;
+    cout<<F0-dinic()<<"\n";
+    return 0;
+}
