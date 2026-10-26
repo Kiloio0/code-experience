@@ -1,0 +1,52 @@
+#include <bits/stdc++.h>
+using namespace std;
+const int N=200005,M=400005;
+int n,m,head[N],to[M],nex[M],tot=1;
+int dfn[N],low[N],tim;
+bool cut[N],bridge[M];
+
+void add(int u,int v){
+    to[++tot]=v;
+    nex[tot]=head[u];
+    head[u]=tot;
+}
+
+void tarjan(int u,int pe){
+    dfn[u]=low[u]=++tim;
+    int child=0;
+    for(int i=head[u];i;i=nex[i]){
+        if(i==(pe^1)) continue;
+        int v=to[i];
+        if(!dfn[v]){
+            child++;
+            tarjan(v,i);
+            low[u]=min(low[u],low[v]);
+            if(pe&&low[v]>=dfn[u]) cut[u]=1;
+            if(low[v]>dfn[u]) bridge[i/2]=1;
+        }else low[u]=min(low[u],dfn[v]);
+    }
+    if(!pe&&child>1) cut[u]=1;
+}
+
+int main(){
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+    cin>>n>>m;
+    for(int i=1,u,v;i<=m;i++){
+        cin>>u>>v;
+        add(u,v);
+        add(v,u);
+    }
+    for(int i=1;i<=n;i++){
+        if(!dfn[i]) tarjan(i,0);
+    }
+    int cnt1=0,cnt2=0;
+    for(int i=1;i<=n;i++) cnt1+=cut[i];
+    for(int i=1;i<=m;i++) cnt2+=bridge[i];
+    cout<<cnt1<<'\n';
+    for(int i=1;i<=n;i++) if(cut[i]) cout<<i<<' ';
+    cout<<'\n'<<cnt2<<'\n';
+    for(int i=1;i<=m;i++) if(bridge[i]) cout<<i<<' ';
+    cout<<'\n';
+    return 0;
+}
